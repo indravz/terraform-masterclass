@@ -1,0 +1,32 @@
+name: terraform cicd infrastructure provisioning
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+  issues: read
+  checks: write
+  pull-requests: write
+jobs:
+  security-group:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ap-south-1
+      
+      - name: setup terraform
+        uses: hashicorp/setup-terraform@v2
+
+      - name: terraform initialize
+        run: cd 1-Intro/simple-webapp && terraform init
+      
+      - name: terraform plan for infrastructure
+        run: cd 1-Intro/simple-webapp && terraform plan
+      
+      - name: terraform apply for infrastructure
+        run: cd 1-Intro/simple-webapp && terraform apply -auto-approve
+  
